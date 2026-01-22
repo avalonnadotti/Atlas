@@ -1,0 +1,620 @@
+﻿<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ATLAS</title>
+  <style>
+    :root{
+      --bg: #070A12;
+      --panel: rgba(10, 14, 28, 0.72);
+      --panel2: rgba(7, 10, 18, 0.55);
+      --text: #E9F1FF;
+      --muted: rgba(233, 241, 255, 0.7);
+      --neon-cyan: #22F7FF;
+      --neon-mag: #FF3DF2;
+      --neon-lime: #7CFF6B;
+      --stroke: rgba(255,255,255,.10);
+      --stroke2: rgba(34, 247, 255, 0.28);
+      --shadow: 0 10px 30px rgba(0,0,0,.45);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body{
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
+      background: radial-gradient(1200px 800px at 20% 0%, rgba(34,247,255,0.10), transparent 55%),
+                  radial-gradient(900px 700px at 80% 10%, rgba(255,61,242,0.10), transparent 55%),
+                  radial-gradient(900px 700px at 50% 100%, rgba(124,255,107,0.08), transparent 60%),
+                  linear-gradient(180deg, #050611, #070A12 65%);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* subtle grid */
+    body::before{
+      content:"";
+      position: fixed;
+      inset: 0;
+      background:
+        linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px) 0 0 / 46px 46px,
+        linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px) 0 0 / 46px 46px;
+      opacity: .35;
+      pointer-events: none;
+      mix-blend-mode: overlay;
+    }
+
+    /* glow accents */
+    body::after{
+      content:"";
+      position: fixed;
+      inset: -200px;
+      background:
+        radial-gradient(400px 300px at 15% 15%, rgba(34,247,255,.22), transparent 60%),
+        radial-gradient(380px 280px at 85% 20%, rgba(255,61,242,.20), transparent 60%),
+        radial-gradient(420px 320px at 55% 85%, rgba(124,255,107,.16), transparent 62%);
+      filter: blur(22px);
+      opacity: .55;
+      pointer-events: none;
+    }
+
+    header{
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(14px);
+      background: linear-gradient(180deg, rgba(7,10,18,.86), rgba(7,10,18,.45));
+      border-bottom: 1px solid var(--stroke);
+    }
+
+    .topbar{
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 18px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .brand{
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      user-select: none;
+    }
+    .atlas{
+      font-size: 22px;
+      letter-spacing: .22em;
+      font-weight: 800;
+      text-transform: uppercase;
+      position: relative;
+      padding-left: 12px;
+    }
+    .atlas::before{
+      content:"";
+      position:absolute;
+      left:0;
+      top: 6px;
+      width: 3px;
+      height: 18px;
+      background: linear-gradient(180deg, var(--neon-cyan), var(--neon-mag));
+      border-radius: 2px;
+      box-shadow: 0 0 16px rgba(34,247,255,.45);
+    }
+    .subtitle{
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      transform: translateY(1px);
+      white-space: nowrap;
+    }
+
+    /* Horizontal menu */
+    nav{
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .nav-item{
+      position: relative;
+    }
+
+    .nav-link{
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(10,14,28,.62), rgba(10,14,28,.36));
+      border: 1px solid var(--stroke);
+      box-shadow: 0 0 0 rgba(0,0,0,0);
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      font-size: 12px;
+      transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease, background .15s ease;
+      white-space: nowrap;
+    }
+
+    .pill-dot{
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--neon-cyan);
+      box-shadow: 0 0 14px rgba(34,247,255,.6);
+      flex: 0 0 auto;
+    }
+
+    .nav-link:hover{
+      transform: translateY(-1px);
+      border-color: rgba(34,247,255,.55);
+      box-shadow: 0 14px 30px rgba(0,0,0,.45), 0 0 18px rgba(34,247,255,.14);
+      background: linear-gradient(180deg, rgba(10,14,28,.78), rgba(10,14,28,.44));
+    }
+
+    /* Dropdown panel (hover expands) */
+    .dropdown{
+      position: absolute;
+      left: 0;
+      top: calc(100% + 10px);
+      min-width: 320px;
+      max-width: 380px;
+      padding: 14px 14px 12px 14px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(10,14,28,.86), rgba(7,10,18,.72));
+      border: 1px solid rgba(34,247,255,.22);
+      box-shadow: var(--shadow), 0 0 26px rgba(34,247,255,.10);
+      opacity: 0;
+      transform: translateY(8px);
+      pointer-events: none;
+      transition: opacity .15s ease, transform .15s ease;
+    }
+
+    .nav-item:hover .dropdown,
+    .nav-item:focus-within .dropdown{
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .drop-title{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .drop-title h3{
+      margin: 0;
+      font-size: 13px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+
+    .badge{
+      font-size: 11px;
+      color: rgba(233,241,255,.85);
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      padding: 4px 8px;
+      border-radius: 999px;
+      letter-spacing: .06em;
+      white-space: nowrap;
+    }
+
+    .drop-list{
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      line-height: 1.85;
+      font-size: 13px;
+    }
+
+    .drop-footer{
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed rgba(255,255,255,.12);
+    }
+
+    .go{
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border-radius: 14px;
+      background: rgba(34,247,255,.08);
+      border: 1px solid rgba(34,247,255,.25);
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      font-size: 12px;
+      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+      white-space: nowrap;
+    }
+    .go:hover{
+      transform: translateY(-1px);
+      background: rgba(34,247,255,.12);
+      border-color: rgba(34,247,255,.42);
+    }
+
+    /* MAIN */
+    main{
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 26px 18px 70px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero{
+      margin-top: 8px;
+      border-radius: 26px;
+      background: linear-gradient(180deg, rgba(10,14,28,.72), rgba(7,10,18,.55));
+      border: 1px solid var(--stroke);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hero::before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background: linear-gradient(90deg, rgba(34,247,255,.25), rgba(255,61,242,.18), rgba(124,255,107,.16));
+      opacity:.18;
+      filter: blur(16px);
+      pointer-events:none;
+    }
+
+    .hero-inner{
+      position: relative;
+      padding: 26px 26px 22px;
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .hero h1{
+      margin: 0 0 10px 0;
+      font-size: 28px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .hero p{
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.65;
+      max-width: 68ch;
+      font-size: 14px;
+    }
+
+    .kpis{
+      display: grid;
+      gap: 10px;
+    }
+    .kpi{
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.20);
+      padding: 12px 12px;
+    }
+    .kpi .label{
+      color: rgba(233,241,255,.68);
+      font-size: 11px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .kpi .value{
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: .06em;
+    }
+    .kpi .hint{
+      color: rgba(233,241,255,.62);
+      font-size: 12px;
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+
+    .grid{
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 14px;
+    }
+
+    .card{
+      grid-column: span 6;
+      border-radius: 22px;
+      background: linear-gradient(180deg, rgba(10,14,28,.62), rgba(7,10,18,.44));
+      border: 1px solid var(--stroke);
+      box-shadow: var(--shadow);
+      padding: 16px 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::after{
+      content:"";
+      position:absolute;
+      inset: 0;
+      background: radial-gradient(420px 240px at 15% 25%, rgba(34,247,255,.12), transparent 60%),
+                  radial-gradient(420px 240px at 85% 30%, rgba(255,61,242,.10), transparent 62%);
+      opacity: .55;
+      pointer-events:none;
+    }
+
+    .card h2{
+      margin: 0 0 10px 0;
+      font-size: 13px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .card p, .card ul{
+      position: relative;
+      z-index: 1;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.65;
+      margin: 0;
+    }
+
+    .card ul{
+      margin-top: 8px;
+      padding-left: 18px;
+      line-height: 1.85;
+    }
+
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      font-size: 11px;
+      letter-spacing: .10em;
+      text-transform: uppercase;
+      color: rgba(233,241,255,.9);
+      white-space: nowrap;
+    }
+
+    footer{
+      max-width: 1180px;
+      margin: 18px auto 0;
+      padding: 0 18px 26px;
+      color: rgba(233,241,255,.55);
+      font-size: 12px;
+      letter-spacing: .06em;
+    }
+
+    /* Responsive */
+    @media (max-width: 920px){
+      .hero-inner{
+        grid-template-columns: 1fr;
+      }
+      .card{ grid-column: span 12; }
+      nav{ justify-content: flex-start; }
+      .dropdown{ min-width: 290px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="topbar">
+      <!-- Title top-left -->
+      <div class="brand">
+        <div class="atlas">ATLAS</div>
+        <div class="subtitle">homelab • automações • memória viva</div>
+      </div>
+
+      <!-- Horizontal menu with hover expand -->
+      <nav aria-label="Projetos">
+        <!-- MNEMOS -->
+        <div class="nav-item">
+          <a class="nav-link" href="/mnemos/">
+            <span class="pill-dot" style="background: var(--neon-cyan)"></span>
+            MNEMOS
+          </a>
+          <div class="dropdown" role="dialog" aria-label="Detalhes MNEMOS">
+            <div class="drop-title">
+              <h3>MNEMOS</h3>
+              <span class="badge">memória & dados</span>
+            </div>
+            <ul class="drop-list">
+              <li>Banco de dados (Postgres)</li>
+              <li>Memória (guarda onde está cada item no acervo)</li>
+              <li>Dados (gerente de unidade de disco)</li>
+              <li>Index (lista todas as indexações existentes)</li>
+            </ul>
+            <div class="drop-footer">
+              <span class="chip">/mnemos</span>
+              <a class="go" href="/mnemos/">Abrir ↗</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- FORGE -->
+        <div class="nav-item">
+          <a class="nav-link" href="/forge/">
+            <span class="pill-dot" style="background: var(--neon-mag)"></span>
+            FORGE
+          </a>
+          <div class="dropdown" role="dialog" aria-label="Detalhes FORGE">
+            <div class="drop-title">
+              <h3>FORGE</h3>
+              <span class="badge">execução & CI</span>
+            </div>
+            <ul class="drop-list">
+              <li>Jenkins (servidor Jenkins e/ou portainer.io)</li>
+              <li>Execução (gerenciador de eventos)</li>
+              <li>Backup (versionador do sistema — CI integrado com Jenkins)</li>
+            </ul>
+            <div class="drop-footer">
+              <span class="chip">/forge</span>
+              <a class="go" href="/forge/">Abrir ↗</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- PYTHIA -->
+        <div class="nav-item">
+          <a class="nav-link" href="/pythia/">
+            <span class="pill-dot" style="background: var(--neon-lime)"></span>
+            PYTHIA
+          </a>
+          <div class="dropdown" role="dialog" aria-label="Detalhes PYTHIA">
+            <div class="drop-title">
+              <h3>PYTHIA</h3>
+              <span class="badge">eventos & API</span>
+            </div>
+            <ul class="drop-list">
+              <li>Backend (API de comunicação dos serviços em Python e n8n)</li>
+            </ul>
+            <div class="drop-footer">
+              <span class="chip">/pythia</span>
+              <a class="go" href="/pythia/">Abrir ↗</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- ORACULO -->
+        <div class="nav-item">
+          <a class="nav-link" href="/oraculo/">
+            <span class="pill-dot" style="background: rgba(255,255,255,.88)"></span>
+            ORACULO
+          </a>
+          <div class="dropdown" role="dialog" aria-label="Detalhes ORACULO">
+            <div class="drop-title">
+              <h3>ORACULO</h3>
+              <span class="badge">observabilidade</span>
+            </div>
+            <ul class="drop-list">
+              <li>Dashboard (cadastros e relatórios)</li>
+            </ul>
+            <div class="drop-footer">
+              <span class="chip">/oraculo</span>
+              <a class="go" href="/oraculo/">Abrir ↗</a>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" aria-label="Resumo do ATLAS">
+      <div class="hero-inner">
+        <div>
+          <h1>Central de Controle do ATLAS</h1>
+          <p>
+            Este índice é o ponto de entrada do ecossistema ATLAS. Tudo que é serviço crítico roda em containers,
+            com domínios separados por responsabilidade: memória (MNEMOS), execução (FORGE), eventos (PYTHIA) e
+            observabilidade (ORACULO). Passe o mouse nos projetos para ver o que cada um faz.
+          </p>
+        </div>
+
+        <div class="kpis" aria-label="Status rápido (estático)">
+          <div class="kpi">
+            <div class="label">Host</div>
+            <div class="value">Windows • Docker • WSL2</div>
+            <div class="hint">Operação 24/7 • acesso remoto via RDP/SSH</div>
+          </div>
+          <div class="kpi">
+            <div class="label">Regra de Ouro</div>
+            <div class="value">Nada crítico fora de container</div>
+            <div class="hint">Infra reproduzível, versionada e documentada.</div>
+          </div>
+          <div class="kpi">
+            <div class="label">Interação futura</div>
+            <div class="value">Wake word: “Atlas”</div>
+            <div class="hint">Modelo de comandos auditáveis (voz → intenção → ação).</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid" aria-label="Cartões de referência">
+      <div class="card">
+        <h2>
+          <span class="pill-dot" style="background: var(--neon-cyan)"></span>
+          MNEMOS — memória viva
+        </h2>
+        <p>Domínio responsável por persistência e conhecimento. Ideal para bancos e catálogo do acervo.</p>
+        <ul>
+          <li>PostgreSQL + dados estruturados</li>
+          <li>Inventário / indexação do acervo</li>
+          <li>Metadados (onde está, versão, hash, origem)</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h2>
+          <span class="pill-dot" style="background: var(--neon-mag)"></span>
+          FORGE — execução
+        </h2>
+        <p>Domínio que roda tarefas reexecutáveis e pipelines. Lugar natural do CI pessoal.</p>
+        <ul>
+          <li>Jenkins / Portainer</li>
+          <li>Jobs, runners e schedules</li>
+          <li>Backup e versionador integrados</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h2>
+          <span class="pill-dot" style="background: var(--neon-lime)"></span>
+          PYTHIA — eventos & API
+        </h2>
+        <p>Domínio que reage a eventos e coordena decisões. Integra Python, n8n e webhooks.</p>
+        <ul>
+          <li>API de comunicação entre serviços</li>
+          <li>Orquestração de fluxos</li>
+          <li>Disparo de ações e alertas</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h2>
+          <span class="pill-dot" style="background: rgba(233,241,255,.85)"></span>
+          ORACULO — dashboard
+        </h2>
+        <p>Domínio visual: relatórios, cadastros e visões de status do ecossistema.</p>
+        <ul>
+          <li>Painel web (consulta e controle)</li>
+          <li>Relatórios e históricos</li>
+          <li>Visão de saúde e execução</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    ATLAS • índice estático (nginx) • menu com expansão no hover • cyberpunk UI • versão inicial
+  </footer>
+</body>
+</html>

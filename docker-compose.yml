@@ -1,0 +1,9 @@
+services:
+  atlas-index:
+    image: nginx:alpine
+    container_name: atlas-index
+    ports:
+      - "8080:80"
+    volumes:
+      - C:/Atlas:/usr/share/nginx/html:ro
+    restart: unless-stopped

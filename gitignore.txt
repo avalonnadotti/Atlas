@@ -1,0 +1,31 @@
+# =========================================
+# ATLAS - Repositório Raiz
+# Orquestrador de infraestrutura
+# =========================================
+
+# Temporários globais
+*.bak
+*.log
+*.tmp
+
+# =========================
+# Subprojetos
+# =========================
+/Forge/
+/Mnemos/
+/Oraculo/
+/Pythia/
+
+# =========================
+# Docker / runtime
+# =========================
+.env
+.env.*
+docker-data/
+volumes/
+logs/
+
+# =========================
+# IDEs / editores
+# =========================
+.vscode/
